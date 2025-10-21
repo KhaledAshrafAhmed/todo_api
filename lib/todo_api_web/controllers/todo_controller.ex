@@ -6,13 +6,12 @@ defmodule TodoApiWeb.TodoController do
 
   action_fallback TodoApiWeb.FallbackController
 
-  def index(conn, _params) do
-    todos = Todos.list_todos()
+  def index(conn, params) do
+    todos = Todos.list_todos(params)
     render(conn, :index, todos: todos)
   end
 
   def create(conn, %{"todo" => todo_params}) do
-    IO.inspect(todo_params, label: "Received todo_params")
     with {:ok, %Todo{} = todo} <- Todos.create_todo(todo_params) do
       conn
       |> put_status(:created)

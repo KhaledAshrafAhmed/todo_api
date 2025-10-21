@@ -17,9 +17,29 @@ defmodule TodoApi.Todos do
       [%Todo{}, ...]
 
   """
-  def list_todos do
-    Repo.all(Todo)
-  end
+def list_todos(params \\ %{}) do
+  query = from t in Todo
+
+  query =
+    Enum.reduce(params, query, fn
+      {"completed", value}, query ->
+        case String.downcase(value) do
+          "true" -> from t in query, where: t.completed == true
+          "false" -> from t in query, where: t.completed == false
+          _ -> raise ArgumentError, "Invalid value for completed: #{value}. Must be 'true' or 'false'."
+        end
+      {"priority", value}, query ->
+        case Integer.parse(value) do
+          {priority, _} -> from t in query, where: t.priority == ^priority
+          :error -> query
+        end
+      _, query ->
+        query
+    end)
+
+  Repo.all(query)
+end
+
 
   @doc """
   Gets a single todo.

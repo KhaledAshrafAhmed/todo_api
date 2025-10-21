@@ -15,6 +15,8 @@ defmodule TodoApi.Todos.Todo do
   def changeset(todo, attrs) do
     todo
     |> cast(attrs, [:title, :description, :completed, :priority])
-    |> validate_required([:title, :description, :completed, :priority])
+    |> validate_required([:title, :description, :completed])
+    |> validate_inclusion(:priority, 1..3)
+    |> validate_length(:title, min: 1, max: 100)
   end
 end
